@@ -1,7 +1,5 @@
 require "ruby2d"
 
-set title: "Tic Tac Toe", width: 300, height: 300
-
 # constants
 $background_color = "#000000"
 $grid_width = 3 # number of cells horizontally
@@ -11,6 +9,8 @@ $padding_around_sign = 10
 $grid_line_width = 3
 $sign_line_width = 3
 
+# initialize canvas
+set title: "Tic Tac Toe", width: 300, height: 300
 set background: $background_color
 
 # grid lines
