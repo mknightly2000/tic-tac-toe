@@ -9,9 +9,11 @@ $padding_around_sign = 10
 $grid_line_width = 3
 $sign_line_width = 3
 
-# initialize canvas
+# initialize game
 set title: "Tic Tac Toe", width: 300, height: 300
 set background: $background_color
+
+board = Array.new($grid_height) { Array.new($grid_width) }
 
 # grid lines
 def draw_grid_line(order, is_vertical)
