@@ -96,5 +96,13 @@ def game_over?(board)
     nil
 end
 
+# ai player
+def evaluate(board)
+    winner = game_over?(board)
+    return 1 if winner == "X"
+    return 0 if winner == "O"
+    0
+end
+
 create_grid
 show
