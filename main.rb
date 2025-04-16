@@ -4,17 +4,28 @@ set title: "Tic Tac Toe", width: 300, height: 300
 
 # constants
 $background_color = "#000000"
-$s = 100  # square_side_length
+$grid_width = 3 # number of cells horizontally
+$grid_height = 3 # number of cells vertically
+$s = 100 # length of cell side
 $padding_around_sign = 10
-$sign_width = 3
+$grid_line_width = 3
+$sign_line_width = 3
 
 set background: $background_color
 
 # grid lines
-Line.new(x1: $s, y1: 0, x2: $s, y2: 3 * $s, width: $sign_width, color: "black")
-Line.new(x1: 2 * $s, y1: 0, x2: 2 * $s, y2: 3 * $s, width: $sign_width, color: "black")
-Line.new(x1: 0, y1: $s, x2: 3 * $s, y2: $s, width: $sign_width, color: "black")
-Line.new(x1: 0, y1: 2 * $s, x2: 3 * $s, y2: 2 * $s, width: $sign_width, color: "black")
+def draw_grid_line(order, is_vertical)
+  if is_vertical
+    Line.new(x1: order * $s, y1: 0, x2: order * $s, y2: $grid_height * $s, width: $grid_line_width, color: "black")
+  else
+    Line.new(x1: 0, y1: order * $s, x2: $grid_width * $s, y2: order * $s, width: $sign_line_width, color: "black")
+  end
+end
+
+draw_grid_line(1, true)
+draw_grid_line(2, true)
+draw_grid_line(1, false)
+draw_grid_line(2, false)
 
 def draw_x(row, col)
   x = col * $s + $padding_around_sign
@@ -29,9 +40,7 @@ def draw_o(row, col)
   x = col * $s + ($s / 2)
   y = row * $s + ($s / 2)
   Circle.new(x: x, y: y, radius: $s / 2 - $padding_around_sign, sectors: 64, color: "blue")
-  Circle.new(x: x, y: y, radius: $s / 2 - $padding_around_sign - $sign_width, sectors: 64, color: $background_color)
+  Circle.new(x: x, y: y, radius: $s / 2 - $padding_around_sign - $sign_line_width, sectors: 64, color: $background_color)
 end
-
-
 
 show
