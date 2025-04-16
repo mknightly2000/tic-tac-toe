@@ -51,5 +51,50 @@ def draw_o(row, col)
   Circle.new(x: x, y: y, radius: $s / 2 - $padding_around_sign - $sign_line_width, sectors: 64, color: $background_color)
 end
 
+# game end
+def game_over?(board)
+  height = board.length
+  width = board[0].length
+
+  # check for horizontal win
+  board.each do |row|
+    sign = row[0]
+    if row.all? { |cell| cell == sign }
+      return sign
+    end
+  end
+
+  # check for vertical win
+  (0...width).each do |col|
+    sign = board[0][col]
+    if (0...height).all? { |row| board[row][col] == sign }
+      return sign
+    end
+  end
+
+  # check for diagonal win only if grid is square
+  if width == height
+    l = width
+
+    # main diagonal (top-left to bottom-right)
+    sign = board[0][0]
+    if (0...l).all? { |i| board[i][i] == sign }
+      return sign
+    end
+
+    # anti-diagonal (top-right to bottom-left)
+    sign = board[0][l - 1]
+    if (0...l).all? { |i| board[i][l - 1 - i] == sign }
+      return sign
+    end
+  end
+
+  # check for draw
+  return 'draw' if board.flatten.all? { |cell| cell != nil }
+
+  # if no winner nor draw return nil
+  nil
+end
+
 create_grid
 show
