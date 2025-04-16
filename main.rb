@@ -3,7 +3,7 @@ require "ruby2d"
 set title: "Tic Tac Toe", width: 300, height: 300
 
 # constants
-$background_color = ""#000000""
+$background_color = "#000000"
 $s = 100  # square_side_length
 $padding_around_sign = 10
 $sign_width = 3
