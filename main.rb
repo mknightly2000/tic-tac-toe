@@ -100,7 +100,7 @@ end
 def evaluate(board)
     winner = game_over?(board)
     return 1 if winner == "X"
-    return 0 if winner == "O"
+    return -1 if winner == "O"
     0
 end
 
