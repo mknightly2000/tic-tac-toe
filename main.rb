@@ -22,11 +22,17 @@ def draw_grid_line(order, is_vertical)
   end
 end
 
-draw_grid_line(1, true)
-draw_grid_line(2, true)
-draw_grid_line(1, false)
-draw_grid_line(2, false)
+def create_grid
+  (1...$grid_width).each do |i|
+    draw_grid_line(i, true)
+  end
 
+  (1...$grid_height).each do |i|
+    draw_grid_line(i, false)
+  end
+end
+
+# Xs and Os
 def draw_x(row, col)
   x = col * $s + $padding_around_sign
   y = row * $s + $padding_around_sign
@@ -43,4 +49,5 @@ def draw_o(row, col)
   Circle.new(x: x, y: y, radius: $s / 2 - $padding_around_sign - $sign_line_width, sectors: 64, color: $background_color)
 end
 
+create_grid
 show
