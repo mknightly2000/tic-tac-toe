@@ -21,9 +21,11 @@ class Game
         # visuals
         @background_color = "#000000"
         @s = 100
-        @padding_around_sign = 10
+        @padding_around_sign = 20
         @grid_line_width = 3
-        @sign_line_width = 3
+        @sign_line_width = 7
+        @x_color = "#008080"
+        @o_color = "#FF7F50"
 
         # window
         @window_title = "Tic Tac Toe"
@@ -203,12 +205,43 @@ class Game
         @game_running = false
     end
 
+    def execute(event=nil)
+    if self.is_running?
+        current_player = self.current_player
+        current_player_type = self.current_player_type
+
+        if current_player_type == "human"
+            click_row = event.y / self.side_width
+            click_col = event.x / self.side_width
+            move = [click_row, click_col]
+        else
+            move = self.get_best_move_for(current_player)
+        end
+
+        if self.mark_at(move).nil?
+            self.make_move(move, current_player)
+            self.draw_mark(current_player, move)
+            self.finish_turn
+        end
+
+        winner = self.get_winner
+        unless winner.nil?
+            self.finish_game
+            if winner == "draw"
+                puts "Draw"
+            else
+                puts "#{winner} won the match!"
+            end
+        end
+    end
+end
+
     # visuals
     def draw_grid_line(order, is_vertical)
         if is_vertical
             Line.new(x1: order * @s, y1: 0, x2: order * @s, y2: @grid_height * @s, width: @grid_line_width, color: "black")
         else
-            Line.new(x1: 0, y1: order * @s, x2: @grid_width * @s, y2: order * @s, width: @sign_line_width, color: "black")
+            Line.new(x1: 0, y1: order * @s, x2: @grid_width * @s, y2: order * @s, width: @grid_line_width, color: "black")
         end
     end
 
@@ -231,57 +264,29 @@ class Game
             y = row * @s + @padding_around_sign
 
             sign_size = @s - 2 * @padding_around_sign
-            Line.new(x1: x, y1: y, x2: x + sign_size, y2: y + sign_size, width: 10, color: "red")
-            Line.new(x1: x + sign_size, y1: y, x2: x, y2: y + sign_size, width: 10, color: "red")
+            Line.new(x1: x, y1: y, x2: x + sign_size, y2: y + sign_size, width: @sign_line_width, color: @x_color)
+            Line.new(x1: x + sign_size, y1: y, x2: x, y2: y + sign_size, width: @sign_line_width, color: @x_color)
         else
             x = col * @s + (@s / 2)
             y = row * @s + (@s / 2)
-            Circle.new(x: x, y: y, radius: @s / 2 - @padding_around_sign, sectors: 64, color: "blue")
-            Circle.new(x: x, y: y, radius: @s / 2 - @padding_around_sign - @sign_line_width, sectors: 64, color: @background_color)
+            Circle.new(x: x, y: y, radius: @s / 2 - @padding_around_sign, sectors: 128, color: @y_color)
+            Circle.new(x: x, y: y, radius: @s / 2 - @padding_around_sign - @sign_line_width, sectors: 128, color: @background_color)
         end
     end
 end
 
 # main
-def execute(game, event=nil)
-    if game.is_running?
-        current_player = game.current_player
-        current_player_type = game.current_player_type
 
-        if current_player_type == "human"
-            click_row = event.y / game.side_width
-            click_col = event.x / game.side_width
-            move = [click_row, click_col]
-        else
-            move = game.get_best_move_for(current_player)
-        end
-
-        if game.mark_at(move).nil?
-            game.make_move(move, current_player)
-            game.draw_mark(current_player, move)
-            game.finish_turn
-        end
-
-        winner = game.get_winner
-        unless winner.nil?
-            game.finish_game
-            if winner == "draw"
-                puts "Draw"
-            else
-                puts "#{winner} won the match!"
-            end
-        end
-    end
-end
 
 game = Game.new(3, 3, "human", "computer")
 game.create_grid
+
 set title: "Tic Tac Toe", width: 300, height: 300
 set background: "#000000"
 
 on :mouse_down do |event|
     if game.current_player_type == "human"
-        execute(game, event)
+        game.execute(event)
     end
 end
 
@@ -289,7 +294,7 @@ tick = 0
 update do
     if tick % 60 == 0
         if game.current_player_type == "computer"
-            execute(game)
+            game.execute
         end
     end
     tick += 1
