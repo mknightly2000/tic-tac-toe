@@ -97,12 +97,43 @@ def game_over?(board)
 end
 
 # ai player
-def evaluate(board)
-    winner = game_over?(board)
+$max_player = "X"
+$min_player = "O"
+
+def evaluate(board, winner = nil)
+    if winner == nil
+        winner = game_over?(board)
+    end
+
     return 1 if winner == "X"
     return -1 if winner == "O"
-    0
+    nil
 end
 
+def minimax(board, depth, player)
+    result = game_over?(board)
+    return evaluate(board, result) if result
+
+    if player == $max_player
+        best_score = -Float::INFINITY
+    else
+        best_score = Float::INFINITY
+    end
+
+    (0...$grid_height).each do |row|
+        (0...$grid_width).each do |col|
+            if board[row][col].nil?
+                board[row][col] = player
+                new_score = minimax(board, depth + 1, player)
+                board[row][col] = nil
+                best_score = player == $max_player ? [best_score, new_score].max : [best_score, new_score].min
+            end
+        end
+    end
+
+    best_score
+end
+
+# main
 create_grid
 show
