@@ -5,10 +5,18 @@ class Game
     @@min_player = "O"
 
     # main functions
-    def initialize(grid_width, grid_height)
+    def initialize(grid_width, grid_height, x_player_type, o_player_type)
         @grid_width = grid_width # number of cells horizontally
         @grid_height = grid_height # number of cells vertically
         @board = Array.new(@grid_height) { Array.new(@grid_width) }
+
+        # game configuration
+        @game_running = true
+        @current_player = "X"
+        @players_types = {
+            "X" => x_player_type,
+            "O" => o_player_type
+        }
 
         # visuals
         @background_color = "#000000"
@@ -166,6 +174,35 @@ class Game
         best_move
     end
 
+    # game management
+    def is_running?
+        @game_running
+    end
+
+    def current_player
+        @current_player
+    end
+
+    def current_player_type
+        @players_types[@current_player]
+    end
+
+    def side_width
+        @s
+    end
+
+    def finish_turn
+        @current_player = get_opponent(@current_player)
+    end
+
+    def mark_at(point)
+        @board[point[0]][point[1]]
+    end
+
+    def finish_game
+        @game_running = false
+    end
+
     # visuals
     def draw_grid_line(order, is_vertical)
         if is_vertical
@@ -185,41 +222,77 @@ class Game
         end
     end
 
-    def draw_x(row, col)
-        x = col * @s + @padding_around_sign
-        y = row * @s + @padding_around_sign
+    def draw_mark(mark, move)
+        row = move[0]
+        col = move[1]
 
-        sign_size = @s - 2 * @padding_around_sign
-        Line.new(x1: x, y1: y, x2: x + sign_size, y2: y + sign_size, width: 10, color: "red")
-        Line.new(x1: x + sign_size, y1: y, x2: x, y2: y + sign_size, width: 10, color: "red")
+        if mark == "X"
+            x = col * @s + @padding_around_sign
+            y = row * @s + @padding_around_sign
+
+            sign_size = @s - 2 * @padding_around_sign
+            Line.new(x1: x, y1: y, x2: x + sign_size, y2: y + sign_size, width: 10, color: "red")
+            Line.new(x1: x + sign_size, y1: y, x2: x, y2: y + sign_size, width: 10, color: "red")
+        else
+            x = col * @s + (@s / 2)
+            y = row * @s + (@s / 2)
+            Circle.new(x: x, y: y, radius: @s / 2 - @padding_around_sign, sectors: 64, color: "blue")
+            Circle.new(x: x, y: y, radius: @s / 2 - @padding_around_sign - @sign_line_width, sectors: 64, color: @background_color)
+        end
     end
-
-    def draw_o(row, col)
-        x = col * @s + (@s / 2)
-        y = row * @s + (@s / 2)
-        Circle.new(x: x, y: y, radius: @s / 2 - @padding_around_sign, sectors: 64, color: "blue")
-        Circle.new(x: x, y: y, radius: @s / 2 - @padding_around_sign - @sign_line_width, sectors: 64, color: @background_color)
-    end
-
 end
 
 # main
-game = Game.new(3, 3)
-game.make_move([0, 0], "X")
-game.make_move([1, 1], "O")
-game.make_move([2, 0], "X")
-game.make_move(game.get_best_move_for("O"), "O")
-game.make_move([1, 2], "X")
-game.print_board
-game.make_move(game.get_best_move_for("O"), "O")
-game.make_move(game.get_best_move_for("X"), "X")
-game.make_move(game.get_best_move_for("O"), "O")
-game.print_board
+def execute(game, event=nil)
+    if game.is_running?
+        current_player = game.current_player
+        current_player_type = game.current_player_type
 
+        if current_player_type == "human"
+            click_row = event.y / game.side_width
+            click_col = event.x / game.side_width
+            move = [click_row, click_col]
+        else
+            move = game.get_best_move_for(current_player)
+        end
 
+        if game.mark_at(move).nil?
+            game.make_move(move, current_player)
+            game.draw_mark(current_player, move)
+            game.finish_turn
+        end
 
-# visuals
-# game.create_grid
-# set title: "hello", width: 300, height: 300
-# set background: "#000000"
-# show
+        winner = game.get_winner
+        unless winner.nil?
+            game.finish_game
+            if winner == "draw"
+                puts "Draw"
+            else
+                puts "#{winner} won the match!"
+            end
+        end
+    end
+end
+
+game = Game.new(3, 3, "human", "computer")
+game.create_grid
+set title: "Tic Tac Toe", width: 300, height: 300
+set background: "#000000"
+
+on :mouse_down do |event|
+    if game.current_player_type == "human"
+        execute(game, event)
+    end
+end
+
+tick = 0
+update do
+    if tick % 60 == 0
+        if game.current_player_type == "computer"
+            execute(game)
+        end
+    end
+    tick += 1
+end
+
+show
