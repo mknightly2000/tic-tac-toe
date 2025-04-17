@@ -51,6 +51,30 @@ def draw_o(row, col)
     Circle.new(x: x, y: y, radius: $s / 2 - $padding_around_sign - $sign_line_width, sectors: 64, color: $background_color)
 end
 
+# misc funcs
+def print_board(board)
+    (0...$grid_height).each do |row|
+        (0...$grid_width).each do |col|
+            if board[row][col].nil?
+                print "   "
+            else
+                print " #{board[row][col]} "
+            end
+            print "|" if col != $grid_width - 1
+        end
+        print "\n"
+        puts "-" * ($grid_width * 3 + ($grid_width - 1)) if row != $grid_height - 1
+    end
+end
+
+def make_move(x, y, player, board)
+    if board[x][y].nil?
+        board[x][y] = player
+        true
+    end
+    false
+end
+
 # game end
 def game_over?(board)
     height = board.length
@@ -135,5 +159,7 @@ def minimax(board, depth, player)
 end
 
 # main
-create_grid
-show
+make_move(0, 2, $max_player, board)
+print_board(board)
+# create_grid
+# show
