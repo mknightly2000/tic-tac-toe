@@ -38,9 +38,22 @@ class Game
         end
     end
 
-    def make_move(x, y, player)
+    def make_move(move, player)
+        x = move[0]
+        y = move[1]
+
         if @board[x][y].nil?
             @board[x][y] = player
+            true
+        end
+        false
+    end
+
+    def undo_move(move)
+        x = move[0]
+        y = move[1]
+        unless @board[x][y].nil?
+            @board[x][y] = nil
             true
         end
         false
@@ -58,7 +71,7 @@ class Game
         end
 
         # check for vertical win
-        (0...width).each do |col|
+        (0...@grid_width).each do |col|
             player = @board[0][col]
             if (0...@grid_height).all? { |row| @board[row][col] == player }
                 return player
@@ -70,7 +83,7 @@ class Game
             l = @grid_width
 
             # main diagonal (top-left to bottom-right)
-            player = board[0][0]
+            player = @board[0][0]
             if (0...l).all? { |i| @board[i][i] == player }
                 return player
             end
@@ -89,7 +102,69 @@ class Game
         nil
     end
 
+    def get_opponent(player)
+        return "O" if player == "X"
+        "X" if player == "O"
+    end
+
     # ai functions
+    def minimax(depth, player)
+        winner = get_winner
+
+        # base cases
+        return 1 if winner == "X"
+        return -1 if winner == "O"
+        return 0 if winner == "draw"
+
+        # recursion
+        if player == @@max_player
+            best_score = -Float::INFINITY
+        else
+            best_score = Float::INFINITY
+        end
+
+        (0...@grid_height).each do |row|
+            (0...@grid_width).each do |col|
+                if @board[row][col].nil?
+                    move = [row, col]
+                    self.make_move(move, player)
+                    new_score = self.minimax(depth + 1, get_opponent(player))
+                    self.undo_move(move)
+                    best_score = player == @@max_player ? [best_score, new_score].max : [best_score, new_score].min
+                end
+            end
+        end
+
+        best_score
+    end
+
+    def get_best_move_for(player)
+        best_move = [] # a move is represented by a pair of coordinates [x, y]
+
+        if player == @@max_player
+            best_score = -Float::INFINITY
+        else
+            best_score = Float::INFINITY
+        end
+
+        (0...@grid_height).each do |row|
+            (0...@grid_width).each do |col|
+                if @board[row][col].nil?
+                    move = [row, col]
+                    self.make_move(move, player)
+                    score = self.minimax(0, get_opponent(player))
+                    self.undo_move(move)
+
+                    if (player == @@max_player && score > best_score) || (player == @@min_player && score < best_score)
+                        best_score = score
+                        best_move = move
+                    end
+                end
+            end
+        end
+
+        best_move
+    end
 
     # visuals
     def draw_grid_line(order, is_vertical)
@@ -128,59 +203,20 @@ class Game
 
 end
 
-# grid lines
-
-# Xs and Os
-
-# game end
-
-# ai player
-$max_player = "X"
-$min_player = "O"
-
-def evaluate(board, winner = nil)
-    if winner == nil
-        winner = game_over?(board)
-    end
-
-    return 1 if winner == "X"
-    return -1 if winner == "O"
-    nil
-end
-
-def minimax(board, depth, player)
-    result = game_over?(board)
-    return evaluate(board, result) if result
-
-    if player == $max_player
-        best_score = -Float::INFINITY
-    else
-        best_score = Float::INFINITY
-    end
-
-    (0...$grid_height).each do |row|
-        (0...$grid_width).each do |col|
-            if board[row][col].nil?
-                board[row][col] = player
-                new_score = minimax(board, depth + 1, player)
-                board[row][col] = nil
-                best_score = player == $max_player ? [best_score, new_score].max : [best_score, new_score].min
-            end
-        end
-    end
-
-    best_score
-end
-
 # main
 game = Game.new(3, 3)
-
-game.make_move(0, 1, "X")
-game.make_move(0, 2, "O")
-game.make_move(1, 1, "X")
-game.make_move(2, 2, "O")
-game.make_move(2, 1, "X")
+game.make_move([0, 0], "X")
+game.make_move([1, 1], "O")
+game.make_move([2, 0], "X")
+game.make_move(game.get_best_move_for("O"), "O")
+game.make_move([1, 2], "X")
 game.print_board
+game.make_move(game.get_best_move_for("O"), "O")
+game.make_move(game.get_best_move_for("X"), "X")
+game.make_move(game.get_best_move_for("O"), "O")
+game.print_board
+
+
 
 # visuals
 # game.create_grid
