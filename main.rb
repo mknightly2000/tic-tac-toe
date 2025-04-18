@@ -3,6 +3,7 @@ require "ruby2d"
 class Game
     @@max_player = "X"
     @@min_player = "O"
+    @@player_to_play_first = "X"
 
     # main functions
     def initialize(grid_width, grid_height, x_player_type, o_player_type)
@@ -12,7 +13,7 @@ class Game
 
         # game configuration
         @game_running = true
-        @current_player = "X"
+        @current_player = @@player_to_play_first
         @players_types = {
             "X" => x_player_type,
             "O" => o_player_type
