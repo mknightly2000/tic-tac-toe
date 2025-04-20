@@ -26,7 +26,7 @@ class Game
         }
 
         # visuals
-        @background_color = "#f8f7f6"
+        @background_color = "#f6f1ec"
         @cell_side_length = 100
         @padding_around_sign = 20
         @grid_line_width = 3
@@ -287,7 +287,7 @@ game = Game.new(3, 3, "human", "computer")
 game.create_grid
 
 set title: "Tic Tac Toe", width: 300, height: 300
-set background: "#f8f7f6"
+set background: "#f6f1ec"
 
 on :mouse_down do |event|
     if game.current_player_type == "human"
