@@ -1,6 +1,6 @@
 <a name="top"></a>
 # Tic-Tac-Toe Game with Ruby 2D
-This is a simple implementation of the classic Tic-Tac-Toe game using Ruby and the Ruby 2D library. It features a graphical interface where players can play against each other or against the computer.
+This is a simple implementation of the classic Tic-Tac-Toe game using Ruby and the Ruby 2D library. It features a graphical interface where a player can play against the computer.
 
 ## Table of Contents
 - [Demo](#demo)
@@ -15,7 +15,7 @@ This is a simple implementation of the classic Tic-Tac-Toe game using Ruby and t
 ## Setup
 To run this game, you need to have Ruby 3.4.3 installed. You can use a version manager like rbenv or RVM to install and manage Ruby versions.
 
-Once you have Ruby 3.4.3 installed, navigate to the project directory and run the following command to install the gem Ruby 2D.
+Once you have Ruby 3.4.3 installed, navigate to the project directory and run the following command to install the gem `ruby2d`.
 
 ```zsh
 bundle install
@@ -46,7 +46,7 @@ Key methods include:
 
 The UI is handled through Ruby2D's event handling and drawing functions. The game loop is managed using Ruby 2D's update block, which checks the game state and updates the display accordingly.
 
-Note: While the Game class can theoretically support different grid sizes, the current UI implementation is specifically designed for a 3x3 grid.
+Note: While the `Game` class can theoretically support different grid sizes, the current UI implementation is specifically designed for a 3x3 grid. In addition, the `Game` class supports a gameplay of a human vs. another human, or a computer vs itself.
 
 ## License
 This project is open source and available under the MIT License.
