@@ -5,6 +5,12 @@ class Game
     @@min_player = "O"
     @@player_to_play_first = "X"
 
+    # variables
+    # move: is represented by a pair of coordinates [x, y]
+    # cell: is represented by a pair of coordinates [x, y]
+    # player: either "X" or "O"
+    # sign: either "X" or "O"
+
     # main functions
     def initialize(grid_width, grid_height, x_player_type, o_player_type)
         @grid_width = grid_width # number of cells horizontally
@@ -14,14 +20,14 @@ class Game
         # game configuration
         @game_running = true
         @current_player = @@player_to_play_first
-        @players_types = {
-            "X" => x_player_type,
-            "O" => o_player_type
+        @players_types = { # a type can either be "computer" or "human"
+                           "X" => x_player_type,
+                           "O" => o_player_type
         }
 
         # visuals
-        @background_color = "#000000"
-        @s = 100
+        @background_color = "#f8f7f6"
+        @cell_side_length = 100
         @padding_around_sign = 20
         @grid_line_width = 3
         @sign_line_width = 7
@@ -118,7 +124,7 @@ class Game
         "X" if player == "O"
     end
 
-    # ai functions
+    # AI functions
     def minimax(depth, player)
         winner = get_winner
 
@@ -150,7 +156,7 @@ class Game
     end
 
     def get_best_move_for(player)
-        best_move = [] # a move is represented by a pair of coordinates [x, y]
+        best_move = []
 
         if player == @@max_player
             best_score = -Float::INFINITY
@@ -191,58 +197,58 @@ class Game
     end
 
     def side_width
-        @s
+        @cell_side_length
     end
 
     def finish_turn
         @current_player = get_opponent(@current_player)
     end
 
-    def mark_at(point)
-        @board[point[0]][point[1]]
+    def sign_at(cell)
+        @board[cell[0]][cell[1]]
     end
 
     def finish_game
         @game_running = false
     end
 
-    def execute(event=nil)
-    if self.is_running?
-        current_player = self.current_player
-        current_player_type = self.current_player_type
+    def execute(event = nil)
+        if self.is_running?
+            current_player = self.current_player
+            current_player_type = self.current_player_type
 
-        if current_player_type == "human"
-            click_row = event.y / self.side_width
-            click_col = event.x / self.side_width
-            move = [click_row, click_col]
-        else
-            move = self.get_best_move_for(current_player)
-        end
-
-        if self.mark_at(move).nil?
-            self.make_move(move, current_player)
-            self.draw_mark(current_player, move)
-            self.finish_turn
-        end
-
-        winner = self.get_winner
-        unless winner.nil?
-            self.finish_game
-            if winner == "draw"
-                puts "Draw"
+            if current_player_type == "human"
+                click_row = event.y / self.side_width
+                click_col = event.x / self.side_width
+                move = [click_row, click_col]
             else
-                puts "#{winner} won the match!"
+                move = self.get_best_move_for(current_player)
+            end
+
+            if self.sign_at(move).nil?
+                self.make_move(move, current_player)
+                self.draw_sign(current_player, move)
+                self.finish_turn
+            end
+
+            winner = self.get_winner
+            unless winner.nil?
+                self.finish_game
+                if winner == "draw"
+                    puts "Draw"
+                else
+                    puts "#{winner} won the match!"
+                end
             end
         end
     end
-end
 
     # visuals
     def draw_grid_line(order, is_vertical)
         if is_vertical
-            Line.new(x1: order * @s, y1: 0, x2: order * @s, y2: @grid_height * @s, width: @grid_line_width, color: "black")
+            Line.new(x1: order * @cell_side_length, y1: 0, x2: order * @cell_side_length, y2: @grid_height * @cell_side_length, width: @grid_line_width, color: "black")
         else
-            Line.new(x1: 0, y1: order * @s, x2: @grid_width * @s, y2: order * @s, width: @grid_line_width, color: "black")
+            Line.new(x1: 0, y1: order * @cell_side_length, x2: @grid_width * @cell_side_length, y2: order * @cell_side_length, width: @grid_line_width, color: "black")
         end
     end
 
@@ -256,34 +262,32 @@ end
         end
     end
 
-    def draw_mark(mark, move)
+    def draw_sign(sign, move)
         row = move[0]
         col = move[1]
 
-        if mark == "X"
-            x = col * @s + @padding_around_sign
-            y = row * @s + @padding_around_sign
+        if sign == "X"
+            x = col * @cell_side_length + @padding_around_sign
+            y = row * @cell_side_length + @padding_around_sign
 
-            sign_size = @s - 2 * @padding_around_sign
+            sign_size = @cell_side_length - 2 * @padding_around_sign
             Line.new(x1: x, y1: y, x2: x + sign_size, y2: y + sign_size, width: @sign_line_width, color: @x_color)
             Line.new(x1: x + sign_size, y1: y, x2: x, y2: y + sign_size, width: @sign_line_width, color: @x_color)
         else
-            x = col * @s + (@s / 2)
-            y = row * @s + (@s / 2)
-            Circle.new(x: x, y: y, radius: @s / 2 - @padding_around_sign, sectors: 128, color: @y_color)
-            Circle.new(x: x, y: y, radius: @s / 2 - @padding_around_sign - @sign_line_width, sectors: 128, color: @background_color)
+            x = col * @cell_side_length + (@cell_side_length / 2)
+            y = row * @cell_side_length + (@cell_side_length / 2)
+            Circle.new(x: x, y: y, radius: @cell_side_length / 2 - @padding_around_sign, sectors: 128, color: @o_color)
+            Circle.new(x: x, y: y, radius: @cell_side_length / 2 - @padding_around_sign - @sign_line_width, sectors: 128, color: @background_color)
         end
     end
 end
 
 # main
-
-
 game = Game.new(3, 3, "human", "computer")
 game.create_grid
 
 set title: "Tic Tac Toe", width: 300, height: 300
-set background: "#000000"
+set background: "#f8f7f6"
 
 on :mouse_down do |event|
     if game.current_player_type == "human"
