@@ -49,7 +49,8 @@ The UI is handled through Ruby2D's event handling and drawing functions. The gam
 Note: While the Game class can theoretically support different grid sizes, the current UI implementation is specifically designed for a 3x3 grid.
 
 ## License
-This project is open source and available under the [MIT](https://choosealicense.com/licenses/mit/) License.
+This project is open source and available under the MIT License.
+See the [LICENSE](LICENSE.md) file for more information.
 
 ##
-[Back to top](#top)
+[Back to Top](#top)
